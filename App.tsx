@@ -1,9 +1,11 @@
-import { useFonts } from "expo-font";
-import { StatusBar } from "expo-status-bar";
-import { useCallback } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import LoginScreen from "./Apps/Screens/Login";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
+import { useFonts } from "expo-font";
+import { useCallback } from "react";
+import { StyleSheet, View } from "react-native";
+import HomeScreen from "./Apps/Screens/Home";
+import LoginScreen from "./Apps/Screens/Login";
+import TabNavigation from "./Apps/Navigations/TabNavigation";
+import { NavigationContainer } from "@react-navigation/native";
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -24,7 +26,9 @@ export default function App() {
     <ClerkProvider publishableKey={publishableKey}>
       <View style={styles.container}>
         <SignedIn>
-          <Text>You are Signed in</Text>
+          <NavigationContainer>
+            <TabNavigation />
+          </NavigationContainer>
         </SignedIn>
         <SignedOut>
           <LoginScreen />
@@ -38,7 +42,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });

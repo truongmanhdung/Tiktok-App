@@ -1,27 +1,52 @@
 import React from "react";
-import { View, StyleSheet, Button, Text, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Button,
+  Text,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { Video, ResizeMode } from "expo-av";
-import Colors from "../../Utils/Colors";
 import * as WebBrowser from "expo-web-browser";
-import { useWarmUpBrowser } from "../../hooks/useWarmUpBrowser";
 import { useOAuth } from "@clerk/clerk-expo";
+import { supabase } from "@/Apps/Utils/SupabaseConfig";
+import { useWarmUpBrowser } from "@/Apps/hooks/useWarmUpBrowser";
+import Colors from "@/Apps/Utils/Colors";
 type Props = {};
 WebBrowser.maybeCompleteAuthSession();
 const LoginScreen = (props: Props) => {
   const video = React.useRef<any>(null);
   const [status, setStatus] = React.useState<any>({});
 
-	useWarmUpBrowser();
+  useWarmUpBrowser();
 
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
 
-	const onLoginGoogle = React.useCallback(async () => {
+  const onLoginGoogle = React.useCallback(async () => {
     try {
       const { createdSessionId, signIn, signUp, setActive } =
         await startOAuthFlow();
 
       if (createdSessionId) {
         setActive && setActive({ session: createdSessionId });
+        if (signUp?.emailAddress) {
+          const { data, error } = await supabase
+            .from("Users")
+            .insert([
+              {
+                name: signUp.firstName + " " + signUp.lastName,
+                email: signUp.emailAddress,
+                username: signUp.emailAddress?.split("@")[0],
+              },
+            ])
+            .select();
+          if (data) {
+            console.log("====================================");
+            console.log(data);
+            console.log("====================================");
+          }
+        }
       } else {
         // Use signIn or signUp for next steps such as MFA
       }
@@ -75,7 +100,7 @@ const LoginScreen = (props: Props) => {
           Utlimate Place to Share your Short videos with friends
         </Text>
         <TouchableOpacity
-					onPress={onLoginGoogle}
+          onPress={onLoginGoogle}
           style={{
             display: "flex",
             alignItems: "center",
@@ -84,9 +109,9 @@ const LoginScreen = (props: Props) => {
             backgroundColor: Colors.WHITE,
             padding: 10,
             borderRadius: 99,
-						paddingHorizontal: 55,
-						position: 'absolute',
-						bottom: 150
+            paddingHorizontal: 55,
+            position: "absolute",
+            bottom: 150,
           }}
         >
           <Image
