@@ -1,5 +1,7 @@
 export default {
-    BACKRGOUND_TRANSNP: '#0000005c',
-    WHITE: '#fff',
-    BLACK: '#000000'
-}
+	BACKRGOUND_TRANSNP: "#0000005c",
+	WHITE: "#fff",
+	BLACK: "#000000",
+	PRIMARY: "#E65C19",
+	PRIMARY_LITE: "#FFA447",
+};

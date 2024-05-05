@@ -1,52 +1,21 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
-import {
-	BottomTabBarButtonProps,
-	createBottomTabNavigator,
-} from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useEffect, useRef } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import * as Animatable from "react-native-animatable";
 import HomeScreen from "../Screens/Home";
 import ProfileScreen from "../Screens/Profile";
 import SearchScreen from "../Screens/Search";
 import VideoScreen from "../Screens/Video";
 import Colors from "../Utils/Colors";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { Text } from "react-native";
-import { useEffect, useRef } from "react";
-import * as Animatable from "react-native-animatable";
-import {
-	animateCircleOne,
-	animateCircleTwo,
-	animateViewOne,
-	animateViewTwo,
-} from "../Utils/them";
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		alignItems: "center",
-	},
-	btn: {
-		width: 50,
-		height: 50,
-		borderWidth: 4,
 		justifyContent: "center",
-		backgroundColor: "transparent",
-		alignItems: "center",
-		borderRadius: 25,
-	},
-	circle: {
-		...StyleSheet.absoluteFillObject,
-		alignItems: "center",
-		justifyContent: "center",
-		backgroundColor: Colors.PRIMARY,
-		borderRadius: 25,
-	},
-	text: {
-		fontSize: 10,
-		alignItems: "center",
-		color: Colors.WHITE,
 	},
 });
 const Tab = createBottomTabNavigator();
@@ -75,23 +44,38 @@ const configRouter = [
 	},
 ];
 
+const renderColor = (route: string, color: string) => {
+	switch (route) {
+		case "Home":
+			return <AntDesign name="home" size={24} color={color} />;
+		case "Search":
+			return <Feather name="search" size={24} color={color} />;
+		case "Video":
+			return <Feather name="video" size={24} color={color} />;
+		case "Profile":
+			return <AntDesign name="profile" size={24} color={color} />;
+		default:
+			break;
+	}
+};
+
 const TabButton = (props: any) => {
 	const { item, onPress, accessibilityState } = props;
 	const focused = accessibilityState?.selected;
 
 	const viewRef = useRef<any>();
-	const circleRef = useRef<any>();
-	const textRef = useRef<any>();
 
 	useEffect(() => {
 		if (focused) {
-			viewRef.current.animate(animateViewOne);
-			circleRef.current.animate(animateCircleOne);
-			textRef.current.transitionTo({ scale: 1 });
+			viewRef.current.animate({
+				0: { scale: 0.5, rotate: "0deg" },
+				1: { scale: 1.5, rotate: "360deg" },
+			});
 		} else {
-			viewRef.current.animate(animateViewTwo);
-			circleRef.current.animate(animateCircleTwo);
-			textRef.current.transitionTo({ scale: 0 });
+			viewRef.current.animate({
+				0: { scale: 1.5, rotate: "360deg" },
+				1: { scale: 1, rotate: "0deg" },
+			});
 		}
 	}, [focused]);
 
@@ -101,25 +85,22 @@ const TabButton = (props: any) => {
 			style={styles.container}
 			onPress={onPress}
 		>
-			<Animatable.View style={styles.container} ref={viewRef} duration={800}>
-				<View
-					style={[
-						styles.btn,
-						{ borderColor: focused ? Colors.WHITE : Colors.PRIMARY },
-					]}
-				>
-					<Animatable.View style={styles.circle} ref={circleRef} />
-					{item.icon}
-				</View>
-				<Animatable.Text ref={textRef} style={styles.text}>
-					{item.route}
-				</Animatable.Text>
+			<Animatable.View
+				animation="zoomIn"
+				style={styles.container}
+				ref={viewRef}
+				duration={800}
+			>
+				{renderColor(
+					item.route,
+					focused ? Colors.PRIMARY : Colors.PRIMARY_LITE,
+				)}
 			</Animatable.View>
 		</TouchableOpacity>
 	);
 };
 
-const TabNavigation = (props: Props) => {
+const TabNavigation2 = (props: Props) => {
 	return (
 		<NavigationContainer>
 			<Tab.Navigator
@@ -127,13 +108,23 @@ const TabNavigation = (props: Props) => {
 					headerShown: false,
 					tabBarStyle: {
 						position: "absolute",
-						bottom: 24,
+						bottom: 16,
 						height: 70,
 						left: 16,
 						right: 16,
 						borderRadius: 16,
-						backgroundColor: Colors.PRIMARY,
-						borderBottomWidth: 1,
+						backgroundColor: Colors.WHITE,
+						shadowColor: "#000",
+						shadowOffset: {
+							width: 0,
+							height: 2,
+						},
+						shadowOpacity: 0.23,
+						shadowRadius: 2.62,
+						elevation: 4,
+						justifyContent: "center",
+						alignItems: "center",
+                        paddingBottom: 0
 					},
 				}}
 			>
@@ -144,6 +135,9 @@ const TabNavigation = (props: Props) => {
 						component={item.component}
 						options={{
 							tabBarShowLabel: false,
+							tabBarLabelStyle: {
+								display: "none",
+							},
 							tabBarButton: (props) => <TabButton {...props} item={item} />,
 						}}
 					/>
@@ -153,4 +147,4 @@ const TabNavigation = (props: Props) => {
 	);
 };
 
-export default TabNavigation;
+export default TabNavigation2;
