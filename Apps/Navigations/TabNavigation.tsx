@@ -1,26 +1,23 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
-import {
-	BottomTabBarButtonProps,
-	createBottomTabNavigator,
-} from "@react-navigation/bottom-tabs";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useEffect, useRef } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import * as Animatable from "react-native-animatable";
 import HomeScreen from "../Screens/Home";
 import ProfileScreen from "../Screens/Profile";
 import SearchScreen from "../Screens/Search";
-import VideoScreen from "../Screens/Video";
 import Colors from "../Utils/Colors";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { Text } from "react-native";
-import { useEffect, useRef } from "react";
-import * as Animatable from "react-native-animatable";
 import {
 	animateCircleOne,
 	animateCircleTwo,
 	animateViewOne,
 	animateViewTwo,
 } from "../Utils/them";
+import AddNavigationScreen from "./AddNavigation";
 
 const styles = StyleSheet.create({
 	container: {
@@ -55,22 +52,22 @@ type Props = {};
 const configRouter = [
 	{
 		route: "Home",
-		icon: <AntDesign name="home" size={24} color="white" />,
+		icon: <AntDesign name="home" size={26} color="white" />,
 		component: HomeScreen,
 	},
 	{
 		route: "Search",
-		icon: <Feather name="search" size={24} color="white" />,
+		icon: <Feather name="search" size={26} color="white" />,
 		component: SearchScreen,
 	},
 	{
-		route: "Video",
-		icon: <Feather name="video" size={24} color="white" />,
-		component: VideoScreen,
+		route: "Add",
+		icon: <Ionicons name="add-circle-sharp" size={26} color="white" />,
+		component: AddNavigationScreen,
 	},
 	{
 		route: "Profile",
-		icon: <AntDesign name="profile" size={24} color="white" />,
+		icon: <FontAwesome name="user" size={24} color="white" />,
 		component: ProfileScreen,
 	},
 ];
@@ -133,7 +130,17 @@ const TabNavigation = (props: Props) => {
 						right: 16,
 						borderRadius: 16,
 						backgroundColor: Colors.PRIMARY,
-						borderBottomWidth: 1,
+						shadowColor: "#000",
+						shadowOffset: {
+							width: 0,
+							height: 2,
+						},
+						shadowOpacity: 0.23,
+						shadowRadius: 2.62,
+						elevation: 4,
+						justifyContent: "center",
+						alignItems: "center",
+						paddingBottom: 0,
 					},
 				}}
 			>
