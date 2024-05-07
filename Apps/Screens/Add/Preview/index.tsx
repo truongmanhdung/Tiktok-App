@@ -1,5 +1,6 @@
 import {
 	Image,
+	Keyboard,
 	KeyboardAvoidingView,
 	SafeAreaView,
 	ScrollView,
@@ -23,6 +24,7 @@ const PreviewScreen = (props: Props) => {
 	const navigation = useNavigation();
 
 	const onPublishVideo = () => {
+		Keyboard.dismiss();
 		const video = params?.video;
 		const thumbnail = params?.thumbnail;
 		uploadFileToAws(video, "video");
@@ -56,7 +58,7 @@ const PreviewScreen = (props: Props) => {
 	return (
 		<SafeAreaView style={styles.safe}>
 			<KeyboardAvoidingView>
-				<ScrollView>
+				<ScrollView keyboardShouldPersistTaps="handled">
 					<View style={styles.container}>
 						<TouchableOpacity
 							onPress={() => navigation.goBack()}
