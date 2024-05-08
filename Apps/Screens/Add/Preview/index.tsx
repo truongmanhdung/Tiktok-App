@@ -10,25 +10,55 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Colors from "@/Apps/Utils/Colors";
 import { s3bucket } from "@/Apps/Utils/S3BucketConfig";
+import { supabase } from "@/Apps/Utils/SupabaseConfig";
+import { useAuth, useOAuth } from "@clerk/clerk-expo";
 type Props = {};
 
 const PreviewScreen = (props: Props) => {
 	const { params }: any = useRoute();
 	const [description, setDescription] = useState<string>();
 
-	const navigation = useNavigation();
+	const { userId } = useAuth();
+	const navigation: any = useNavigation();
 
-	const onPublishVideo = () => {
+	const getEmail = async () => {
+		const { data, error } = await supabase
+			.from("Users")
+			.select("*")
+			.eq("userId", userId);
+		if (data) {
+			return data[0]?.email;
+		}
+	};
+
+	const onPublishVideo = async () => {
 		Keyboard.dismiss();
 		const video = params?.video;
 		const thumbnail = params?.thumbnail;
-		uploadFileToAws(video, "video");
-		uploadFileToAws(thumbnail, "image");
+		const dataVideo = await uploadFileToAws(video, "video");
+		const dataThumbnail = await uploadFileToAws(thumbnail, "image");
+		const emailRef = await getEmail();
+		if (dataVideo && dataThumbnail) {
+			const { data, error } = await supabase
+				.from("PostLists")
+				.insert([
+					{
+						videoUrl: dataVideo?.Location,
+						thumbnail: dataThumbnail.Location,
+						description: description,
+						emailRef: emailRef,
+					},
+				])
+				.select();
+			if (data) {
+				navigation.navigate("Home", { isRefresh: true });
+			}
+		}
 	};
 
 	const uploadFileToAws = async (file: any, type: string) => {
@@ -44,12 +74,10 @@ const PreviewScreen = (props: Props) => {
 		};
 		console.log("params: ", params);
 		try {
-			const data = await s3bucket
+			return await s3bucket
 				.upload(params)
 				.promise()
-				.then((res) => {
-					console.log("res", res);
-				});
+				.then(async (res) => res);
 		} catch (error) {
 			console.log("error", error);
 		}
@@ -58,6 +86,7 @@ const PreviewScreen = (props: Props) => {
 	return (
 		<SafeAreaView style={styles.safe}>
 			<KeyboardAvoidingView>
+				{/* tắt sự kiện click button đóng keybourd trước nhưng ko thực hiện action button: keyboardShouldPersistTaps="handled" */}
 				<ScrollView keyboardShouldPersistTaps="handled">
 					<View style={styles.container}>
 						<TouchableOpacity
